@@ -1,0 +1,168 @@
+@model VehicleRentalSystem.Models.Booking
+
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        Booking Details
+                    </h3>
+                </div>
+
+                <div class="card-body">
+
+                    <h4 class="mb-3">
+                        @Model.Vehicle?.VehicleName
+                    </h4>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th>Booking ID</th>
+                            <td>#@Model.BookingId</td>
+                        </tr>
+
+                        <tr>
+                            <th>Customer</th>
+                            <td>@Model.Customer?.Name</td>
+                        </tr>
+
+                        <tr>
+                            <th>Email</th>
+                            <td>@Model.Customer?.Email</td>
+                        </tr>
+
+                        <tr>
+                            <th>Phone</th>
+                            <td>@Model.Customer?.Phone</td>
+                        </tr>
+
+                        <tr>
+                            <th>Vehicle</th>
+                            <td>
+                                @Model.Vehicle?.Brand
+                                @Model.Vehicle?.Model
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Vehicle Number</th>
+                            <td>
+                                @Model.Vehicle?.VehicleNumber
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Pickup Date</th>
+                            <td>
+                                @Model.PickupDate.ToString("dd-MM-yyyy")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Return Date</th>
+                            <td>
+                                @Model.ReturnDate.ToString("dd-MM-yyyy")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Total Days</th>
+                            <td>@Model.TotalDays</td>
+                        </tr>
+
+                        <tr>
+                            <th>Price Per Day</th>
+                            <td>
+                                ₹@Model.Vehicle?.PricePerDay
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Total Amount</th>
+                            <td>
+                                <strong>
+                                    ₹@Model.TotalAmount
+                                </strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Booking Date</th>
+                            <td>
+                                @Model.BookingDate.ToString("dd-MM-yyyy hh:mm tt")
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Status</th>
+                            <td>
+
+                                @if (Model.BookingStatus == "Confirmed")
+                                {
+                                    <span class="badge bg-success">
+                                        Confirmed
+                                    </span>
+                                }
+                                else if (Model.BookingStatus == "Cancelled")
+                                {
+                                    <span class="badge bg-danger">
+                                        Cancelled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        @Model.BookingStatus
+                                    </span>
+                                }
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                    <div class="d-flex gap-2">
+
+                        <a asp-action="MyBookings"
+                           class="btn btn-secondary">
+                            Back to My Bookings
+                        </a>
+
+                        @if (Model.BookingStatus == "Confirmed")
+                        {
+                            <form asp-action="Cancel"
+                                  asp-route-id="@Model.BookingId"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to cancel this booking?');">
+                                    Cancel Booking
+                                </button>
+
+                            </form>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,639 @@
+﻿
+@{
+    ViewData["Title"] = "Home";
+    var isAdmin = Context.Session.GetString("IsAdmin") == "true";
+    var isCustomer = Context.Session.GetInt32("CustomerId") != null;
+}
+
+<style>
+    .home-page {
+        background: #f7f8f4;
+        color: #173c2b;
+        overflow: hidden;
+    }
+
+    .rental-hero {
+        background: #123d2b;
+        color: white;
+        border-radius: 0 0 30px 30px;
+        padding: 75px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .rental-hero::before {
+        content: "";
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: rgba(215, 243, 107, 0.07);
+        right: -100px;
+        top: -170px;
+    }
+
+    .rental-hero::after {
+        content: "";
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        border: 1px solid rgba(215, 243, 107, 0.18);
+        right: 12%;
+        bottom: -150px;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-label {
+        display: inline-block;
+        background: rgba(215, 243, 107, 0.12);
+        color: #d7f36b;
+        border: 1px solid rgba(215, 243, 107, 0.35);
+        padding: 8px 15px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 22px;
+    }
+
+    .hero-heading {
+        color: #ffffff;
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        line-height: 1.08;
+        font-weight: 800;
+        letter-spacing: -2px;
+        margin-bottom: 22px;
+    }
+
+    .hero-heading span {
+        color: #d7f36b;
+    }
+
+    .hero-description {
+        color: #d5e4d8;
+        font-size: 17px;
+        max-width: 510px;
+        line-height: 1.9;
+    }
+
+    .btn-lime {
+        background: #d7f36b;
+        border: 2px solid #d7f36b;
+        color: #173c2b;
+        font-weight: 750;
+        border-radius: 10px;
+        padding: 13px 24px;
+        transition: 0.2s ease;
+    }
+
+    .btn-lime:hover {
+        background: #e5ff91;
+        border-color: #e5ff91;
+        color: #123d2b;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-light-green {
+        background: transparent;
+        border: 1px solid #b9d4c1;
+        color: white;
+        font-weight: 650;
+        border-radius: 10px;
+        padding: 13px 24px;
+    }
+
+    .btn-outline-light-green:hover {
+        background: white;
+        color: #123d2b;
+    }
+
+    .hero-visual {
+        min-height: 330px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .hero-vehicle-card {
+        width: 100%;
+        max-width: 440px;
+        padding: 25px;
+        border-radius: 24px;
+        background: linear-gradient(145deg, #245c41, #19432f);
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 0 25px 55px rgba(0,0,0,0.2);
+        transform: rotate(2deg);
+    }
+
+    .vehicle-illustration {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .hero-card-tag {
+        background: #d7f36b;
+        color: #173c2b;
+        border-radius: 8px;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 800;
+        padding: 7px 12px;
+    }
+
+    .section-label {
+        color: #28734e;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .section-heading {
+        color: #173c2b;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .service-card {
+        background: #ffffff;
+        border: 1px solid #e4eae2;
+        border-radius: 18px;
+        padding: 28px;
+        height: 100%;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(18,61,43,0.10);
+    }
+
+    .service-icon {
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: #edf5df;
+        color: #1e6545;
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+
+    .service-card h4 {
+        color: #173c2b;
+        font-weight: 750;
+        font-size: 19px;
+    }
+
+    .service-card p {
+        color: #69776c;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    .steps-section {
+        background: #edf2e9;
+        border-radius: 24px;
+    }
+
+    .step-number {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #123d2b;
+        color: #d7f36b;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .bottom-cta {
+        background: #123d2b;
+        color: white;
+        border-radius: 22px;
+        padding: 38px;
+    }
+
+    .bottom-cta h2 {
+        color: white;
+        font-weight: 800;
+    }
+
+    .bottom-cta p {
+        color: #d5e4d8;
+    }
+
+    .home-page .container {
+        position: relative;
+        z-index: 1;
+    }
+
+@@media (max-width: 767px) {        .rental-hero {
+            padding: 50px 0;
+            border-radius: 0 0 22px 22px;
+        }
+
+        .hero-heading {
+            letter-spacing: -1px;
+        }
+
+        .hero-visual {
+            min-height: 230px;
+            margin-top: 25px;
+        }
+
+        .hero-vehicle-card {
+            padding: 18px;
+        }
+
+        .bottom-cta {
+            padding: 25px;
+        }
+    }
+</style>
+
+<div class="home-page">
+
+    <!-- HERO SECTION -->
+    <section class="rental-hero">
+        <div class="container">
+            <div class="row align-items-center g-4">
+
+                <div class="col-lg-7 hero-content">
+
+                    <div class="hero-label">
+                        YOUR JOURNEY, YOUR WAY
+                    </div>
+
+                    <h1 class="hero-heading">
+                        Find Your Ride.<br />
+                        <span>Own The Road.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Discover the freedom of the open road.
+                        Choose your favourite car or bike and make
+                        every journey comfortable, easy and memorable.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+
+                        <a asp-controller="Vehicle"
+                           asp-action="Index"
+                           class="btn btn-lime">
+                            Explore Vehicles &rarr;
+                        </a>
+
+                        @if (!isAdmin && !isCustomer)
+                        {
+                            <a asp-controller="Account"
+                               asp-action="Register"
+                               class="btn btn-outline-light-green">
+                                Get Started
+                            </a>
+                        }
+                        else if (isAdmin)
+                        {
+                            <a asp-controller="Admin"
+                               asp-action="Dashboard"
+                               class="btn btn-outline-light-green">
+                                Admin Dashboard
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Booking"
+                               asp-action="MyBookings"
+                               class="btn btn-outline-light-green">
+                                My Bookings
+                            </a>
+                        }
+
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-4 mt-5">
+
+                        <div>
+                            <h5 style="color:#d7f36b; font-weight:800;">
+                                Easy
+                            </h5>
+                            <small style="color:#d5e4d8;">
+                                Booking Process
+                            </small>
+                        </div>
+
+                        <div>
+                            <h5 style="color:#d7f36b; font-weight:800;">
+                                Flexible
+                            </h5>
+                            <small style="color:#d5e4d8;">
+                                Travel Options
+                            </small>
+                        </div>
+
+                        <div>
+                            <h5 style="color:#d7f36b; font-weight:800;">
+                                Reliable
+                            </h5>
+                            <small style="color:#d5e4d8;">
+                                Rental Experience
+                            </small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Decorative vehicle illustration -->
+                <div class="col-lg-5 hero-content">
+                    <div class="hero-visual">
+                        <div class="hero-vehicle-card">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="hero-card-tag">
+                                    FIND YOUR RIDE
+                                </span>
+
+                                <span style="color:#d7f36b; font-size:13px;">
+                                    DRIVE MORE
+                                </span>
+                            </div>
+
+                            <svg class="vehicle-illustration"
+                                 viewBox="0 0 440 230"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 role="img"
+                                 aria-label="Stylized green rental car illustration">
+
+                                <defs>
+                                    <linearGradient id="carPaint"
+                                                    x1="0" y1="0"
+                                                    x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#f0f6d9" />
+                                        <stop offset="100%" stop-color="#b9d49a" />
+                                    </linearGradient>
+                                </defs>
+
+                                <ellipse cx="220" cy="190"
+                                         rx="180" ry="17"
+                                         fill="#0a281c"
+                                         opacity="0.55" />
+
+                                <path d="M57 145
+                                         L77 109
+                                         Q84 97 102 93
+                                         L151 83
+                                         L191 47
+                                         Q202 37 222 37
+                                         L280 39
+                                         Q300 40 314 59
+                                         L340 94
+                                         L365 105
+                                         Q381 111 385 129
+                                         L390 158
+                                         Q391 172 374 174
+                                         L65 174
+                                         Q48 171 50 158 Z"
+                                      fill="url(#carPaint)"
+                                      stroke="#ffffff"
+                                      stroke-width="2" />
+
+                                <path d="M166 82
+                                         L202 49
+                                         Q208 44 222 44
+                                         L248 45
+                                         L248 82 Z"
+                                      fill="#24513b" />
+
+                                <path d="M258 45
+                                         L279 47
+                                         Q291 48 301 63
+                                         L317 84
+                                         L258 82 Z"
+                                      fill="#24513b" />
+
+                                <path d="M75 121 L113 121"
+                                      stroke="#6f9463"
+                                      stroke-width="4"
+                                      stroke-linecap="round" />
+
+                                <path d="M328 120 L366 126"
+                                      stroke="#d7f36b"
+                                      stroke-width="8"
+                                      stroke-linecap="round" />
+
+                                <rect x="170" y="111"
+                                      width="76" height="5"
+                                      rx="2.5"
+                                      fill="#78956a" />
+
+                                <circle cx="125" cy="167" r="31"
+                                        fill="#142d25"
+                                        stroke="#dce8d2"
+                                        stroke-width="4" />
+
+                                <circle cx="125" cy="167" r="15"
+                                        fill="#c6d9ad" />
+
+                                <circle cx="125" cy="167" r="6"
+                                        fill="#315943" />
+
+                                <circle cx="323" cy="167" r="31"
+                                        fill="#142d25"
+                                        stroke="#dce8d2"
+                                        stroke-width="4" />
+
+                                <circle cx="323" cy="167" r="15"
+                                        fill="#c6d9ad" />
+
+                                <circle cx="323" cy="167" r="6"
+                                        fill="#315943" />
+
+                                <path d="M48 147 L71 147"
+                                      stroke="#d7f36b"
+                                      stroke-width="5"
+                                      stroke-linecap="round" />
+
+                            </svg>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <div style="color:#ffffff; font-weight:750; font-size:18px;">
+                                        Your Next Adventure
+                                    </div>
+                                    <small style="color:#c9daca;">
+                                        Starts with the right ride
+                                    </small>
+                                </div>
+
+                                <span style="color:#d7f36b; font-size:28px;">
+                                    &#8599;
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section class="container py-5">
+
+        <div class="text-center mb-5">
+            <div class="section-label mb-2">
+                WHY CHOOSE US
+            </div>
+
+            <h2 class="section-heading">
+                Your Ride, Made Simple
+            </h2>
+
+            <p class="text-muted mt-3">
+                Everything you need for a smooth rental experience.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        &#128663;
+                    </div>
+
+                    <h4>Wide Vehicle Choices</h4>
+
+                    <p>
+                        Explore available cars and bikes
+                        to find the right ride for your journey.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        &#128197;
+                    </div>
+
+                    <h4>Easy Booking</h4>
+
+                    <p>
+                        Select a vehicle, choose your dates
+                        and manage your bookings in one place.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        &#8377;
+                    </div>
+
+                    <h4>Clear Rental Pricing</h4>
+
+                    <p>
+                        Check the daily rental price and
+                        estimated booking amount before booking.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="container pb-5">
+
+        <div class="steps-section p-4 p-md-5">
+
+            <div class="text-center mb-5">
+                <div class="section-label mb-2">
+                    SIMPLE PROCESS
+                </div>
+
+                <h2 class="section-heading">
+                    How It Works
+                </h2>
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+                    <div class="step-number">01</div>
+                    <h5 class="fw-bold">Choose Your Vehicle</h5>
+                    <p class="text-muted">
+                        Browse the vehicles and view their
+                        details and rental prices.
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="step-number">02</div>
+                    <h5 class="fw-bold">Book Your Ride</h5>
+                    <p class="text-muted">
+                        Select pickup and return dates
+                        to create your booking.
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="step-number">03</div>
+                    <h5 class="fw-bold">Enjoy Your Journey</h5>
+                    <p class="text-muted">
+                        Track your bookings and enjoy
+                        a convenient rental experience.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- BOTTOM CALL TO ACTION -->
+    <section class="container pb-5">
+
+        <div class="bottom-cta">
+            <div class="row align-items-center g-4">
+
+                <div class="col-lg-8">
+                    <h2>
+                        Ready to Hit the Road?
+                    </h2>
+
+                    <p class="mb-0 mt-2">
+                        Find a vehicle that fits your plans
+                        and start your next journey.
+                    </p>
+                </div>
+
+                <div class="col-lg-4 text-lg-end">
+
+                    <a asp-controller="Vehicle"
+                       asp-action="Index"
+                       class="btn btn-lime">
+                        Browse All Vehicles &rarr;
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>

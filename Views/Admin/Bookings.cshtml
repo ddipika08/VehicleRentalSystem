@@ -1,0 +1,198 @@
+
+@model IEnumerable<VehicleRentalSystem.Models.Booking>
+
+@{
+    ViewData["Title"] = "Manage Bookings";
+}
+
+<style>
+    .booking-page {
+        padding-top: 30px;
+        padding-bottom: 50px;
+    }
+
+    .booking-heading {
+        color: #123D2B;
+        font-weight: 800;
+    }
+
+    .booking-subtitle {
+        color: #647067;
+    }
+
+    .booking-card {
+        background: #fff;
+        border: 1px solid #e4e9e2;
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(18, 61, 43, 0.07);
+        overflow: hidden;
+    }
+
+    .booking-card-header {
+        padding: 22px;
+        border-bottom: 1px solid #e8ece6;
+    }
+
+    .booking-table th {
+        background: #123D2B;
+        color: #fff;
+        font-size: 13px;
+        white-space: nowrap;
+        padding: 15px;
+    }
+
+    .booking-table td {
+        padding: 15px;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .booking-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: #edf5df;
+        color: #245b35;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .booking-search {
+        max-width: 380px;
+        border-radius: 10px;
+        padding: 11px 14px;
+    }
+
+    .booking-id {
+        color: #1E6545;
+        font-weight: 800;
+    }
+</style>
+
+<div class="container booking-page">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="booking-heading">Manage Bookings</h1>
+            <p class="booking-subtitle mb-0">
+                View and monitor vehicle rental reservations.
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="Dashboard"
+           class="btn btn-outline-success">
+            &larr; Back to Dashboard
+        </a>
+    </div>
+
+    <div class="booking-card">
+
+        <div class="booking-card-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Booking Records</h5>
+                    <span class="text-muted small">
+                        Total bookings: @Model.Count()
+                    </span>
+                </div>
+
+                <input type="text"
+                       id="bookingSearch"
+                       class="form-control booking-search"
+                       placeholder="Search booking records..." />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover booking-table mb-0" id="bookingsTable">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Booking Date</th>
+                        <th>Pickup Date</th>
+                        <th>Return Date</th>
+                        <th>Total Days</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td class="booking-id">
+                                #@booking.BookingId
+                            </td>
+
+                            <td>
+                                @(booking.Customer?.Name ?? $"Customer #{booking.CustomerId}")
+                            </td>
+
+                            <td>
+                                @(booking.Vehicle?.VehicleName ?? $"Vehicle #{booking.VehicleId}")
+                            </td>
+
+                            <td>
+                                @booking.BookingDate.ToLocalTime().ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @booking.PickupDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @booking.ReturnDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @booking.TotalDays days
+                            </td>
+
+                            <td class="fw-bold">
+                                ₹@booking.TotalAmount.ToString("N2")
+                            </td>
+
+                            <td>
+                                <span class="booking-status">
+                                    @booking.BookingStatus
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <h5 class="fw-bold">No bookings found</h5>
+                <p class="text-muted mb-0">
+                    Customer reservations will appear here.
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("bookingSearch");
+        const rows = document.querySelectorAll("#bookingsTable tbody tr");
+
+        searchInput.addEventListener("input", function () {
+            const searchText = this.value.toLowerCase().trim();
+
+            rows.forEach(function (row) {
+                row.style.display = row.innerText.toLowerCase().includes(searchText)
+                    ? ""
+                    : "none";
+            });
+        });
+    });
+</script>
+```

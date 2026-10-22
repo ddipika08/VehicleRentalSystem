@@ -1,0 +1,131 @@
+@model VehicleRentalSystem.Models.Payment
+
+@{
+    ViewData["Title"] = "Payment Status";
+}
+
+<style>
+    .confirmation-page {
+        background: #F7F8F4;
+        min-height: 80vh;
+        padding: 50px 0;
+    }
+
+    .confirmation-card {
+        background: white;
+        border-radius: 18px;
+        padding: 35px;
+        max-width: 650px;
+        margin: auto;
+        box-shadow: 0 6px 25px rgba(0,0,0,.07);
+    }
+
+    .confirmation-title {
+        color: #123D2B;
+        font-weight: 800;
+    }
+
+    .btn-green {
+        background: #1E6545;
+        color: white;
+    }
+
+    .btn-green:hover {
+        background: #123D2B;
+        color: white;
+    }
+</style>
+
+<div class="confirmation-page">
+    <div class="container">
+
+        <div class="confirmation-card">
+
+            <h2 class="confirmation-title mb-3">
+                Payment Status
+            </h2>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-info">
+                    @TempData["Success"]
+                </div>
+            }
+
+            <p>
+                <strong>Payment ID:</strong>
+                #@Model.PaymentId
+            </p>
+
+            <p>
+                <strong>Booking ID:</strong>
+                #@Model.BookingId
+            </p>
+
+            <p>
+                <strong>Vehicle:</strong>
+                @(Model.Booking?.Vehicle?.VehicleName ?? "Vehicle")
+            </p>
+
+            <p>
+                <strong>Payment Method:</strong>
+                @Model.PaymentMethod
+            </p>
+
+            <p>
+                <strong>Amount:</strong>
+                ₹@Model.Amount.ToString("N2")
+            </p>
+
+            <p>
+                <strong>Transaction Reference:</strong>
+                @(Model.TransactionId ?? "Not submitted")
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+
+                @if (Model.PaymentStatus == "Paid")
+                {
+                    <span class="badge bg-success">Paid</span>
+                }
+                else if (Model.PaymentStatus == "Failed")
+                {
+                    <span class="badge bg-danger">Failed</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">
+                        @Model.PaymentStatus
+                    </span>
+                }
+            </p>
+
+            @if (Model.PaymentStatus == "Paid")
+            {
+                <div class="alert alert-success">
+                    Payment has been confirmed.
+                </div>
+            }
+            else if (Model.PaymentMethod == "Cash")
+            {
+                <div class="alert alert-info">
+                    Pay cash to the rental staff. Admin confirmation is required.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Your payment has not yet been verified. Keep your payment receipt.
+                </div>
+            }
+
+            <a asp-controller="Booking"
+               asp-action="MyBookings"
+               class="btn btn-green mt-3">
+                Back to My Bookings
+            </a>
+
+        </div>
+    </div>
+</div>

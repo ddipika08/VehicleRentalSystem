@@ -1,0 +1,527 @@
+
+@model IEnumerable<VehicleRentalSystem.Models.Vehicle>
+
+@{
+    ViewData["Title"] = "Explore Vehicles";
+    var isAdmin = Context.Session.GetString("IsAdmin") == "true";
+}
+
+<style>
+    .vehicles-page {
+        max-width: 1250px;
+        margin: auto;
+    }
+
+    .vehicles-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 38px;
+        margin-bottom: 30px;
+        border-radius: 22px;
+        color: white;
+        background: linear-gradient(120deg, #123D2B, #1E6545);
+    }
+
+    .vehicles-hero h1 {
+        color: white;
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .vehicles-hero p {
+        max-width: 580px;
+        color: #E0EAE1;
+        margin-bottom: 0;
+    }
+
+    .vehicle-search {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+        padding: 18px;
+        background: white;
+        border: 1px solid #E0E7DF;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(18, 61, 43, 0.05);
+    }
+
+    .vehicle-search input,
+    .vehicle-search select {
+        flex: 1;
+        min-width: 180px;
+        padding: 12px 14px;
+        border: 1px solid #D5DFD5;
+        border-radius: 10px;
+        outline: none;
+        background: #FFFFFF;
+    }
+
+    .vehicle-search input:focus,
+    .vehicle-search select:focus {
+        border-color: #1E6545;
+        box-shadow: 0 0 0 3px rgba(30, 101, 69, 0.10);
+    }
+
+    .vehicle-count {
+        color: #718075;
+        font-size: 14px;
+        margin-bottom: 18px;
+    }
+
+    .vehicle-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #FFFFFF;
+        border: 1px solid #E0E7DF;
+        border-radius: 18px;
+        box-shadow: 0 6px 24px rgba(18, 61, 43, 0.06);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 32px rgba(18, 61, 43, 0.13);
+    }
+
+    .vehicle-photo {
+        position: relative;
+        height: 215px;
+        overflow: hidden;
+        background: #E8EEE7;
+    }
+
+    .vehicle-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .35s ease;
+    }
+
+    .vehicle-card:hover .vehicle-photo img {
+        transform: scale(1.04);
+    }
+
+    .vehicle-photo-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #1E6545;
+        font-size: 17px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #E8F2E9, #F7F8F4);
+    }
+
+    .vehicle-status {
+        position: absolute;
+        top: 13px;
+        right: 13px;
+        padding: 6px 11px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 800;
+        background: #E7F7E9;
+        color: #176438;
+    }
+
+    .vehicle-status.unavailable {
+        background: #FBE8E7;
+        color: #A12B25;
+    }
+
+    .vehicle-info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 21px;
+    }
+
+    .vehicle-category {
+        display: inline-block;
+        align-self: flex-start;
+        margin-bottom: 10px;
+        padding: 5px 10px;
+        color: #1E6545;
+        background: #E8F2E9;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .vehicle-name {
+        margin-bottom: 4px;
+        color: #123D2B;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .vehicle-brand {
+        margin-bottom: 16px;
+        color: #718075;
+        font-size: 14px;
+    }
+
+    .vehicle-specs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .vehicle-spec {
+        padding: 10px;
+        background: #F7F8F4;
+        border-radius: 9px;
+        color: #536357;
+        font-size: 13px;
+    }
+
+    .vehicle-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        padding-top: 15px;
+        margin-top: auto;
+        border-top: 1px solid #E8EEE7;
+    }
+
+    .vehicle-price {
+        color: #1E6545;
+        font-size: 25px;
+        font-weight: 850;
+    }
+
+    .vehicle-price-unit {
+        color: #718075;
+        font-size: 13px;
+    }
+
+    .vehicle-actions {
+        display: flex;
+        gap: 9px;
+        margin-top: 16px;
+    }
+
+    .vehicle-actions .btn {
+        flex: 1;
+        white-space: nowrap;
+    }
+
+    .vehicle-empty {
+        display: none;
+        padding: 50px 20px;
+        text-align: center;
+        background: white;
+        border: 1px dashed #B8C9B8;
+        border-radius: 16px;
+    }
+
+    .vehicle-empty h3 {
+        margin-bottom: 8px;
+    }
+
+    @@media (max-width: 576px) {
+        .vehicles-hero {
+            padding: 26px 20px;
+            border-radius: 16px;
+        }
+
+        .vehicle-search {
+            padding: 13px;
+        }
+
+        .vehicle-search input,
+        .vehicle-search select {
+            min-width: 100%;
+        }
+
+        .vehicle-photo {
+            height: 200px;
+        }
+
+        .vehicle-info {
+            padding: 17px;
+        }
+    }
+</style>
+
+<div class="container vehicles-page">
+
+    <section class="vehicles-hero">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                @if (isAdmin)
+                {
+                    <h1>Vehicle Management</h1>
+                    <p>Manage your rental fleet and keep vehicle information up to date.</p>
+                }
+                else
+                {
+                    <h1>Find Your Perfect Ride</h1>
+                    <p>Explore our vehicles, compare prices and choose the right ride for your next journey.</p>
+                }
+            </div>
+
+            @if (isAdmin)
+            {
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <a asp-controller="Vehicle"
+                       asp-action="Create"
+                       class="btn btn-warning">
+                        + Add New Vehicle
+                    </a>
+                </div>
+            }
+        </div>
+    </section>
+
+    <div class="vehicle-search">
+        <input type="text"
+               id="vehicleSearch"
+               placeholder="Search by vehicle name, brand or model..."
+               aria-label="Search vehicles" />
+
+        <select id="categoryFilter" aria-label="Filter by category">
+            <option value="">All Categories</option>
+            @foreach (var category in Model
+                .Where(v => !string.IsNullOrWhiteSpace(v.Category))
+                .Select(v => v.Category)
+                .Distinct()
+                .OrderBy(c => c))
+            {
+                <option value="@category">@category</option>
+            }
+        </select>
+
+        <select id="statusFilter" aria-label="Filter by availability">
+            <option value="">All Availability</option>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+        </select>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="section-title mb-0">Our Vehicles</h2>
+        <span class="vehicle-count" id="vehicleCount">
+            @Model.Count() vehicles found
+        </span>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row g-4" id="vehicleGrid">
+
+            @foreach (var vehicle in Model)
+            {
+                var isAvailable = string.Equals(
+                    vehicle.Status,
+                    "Available",
+                    StringComparison.OrdinalIgnoreCase);
+
+                <div class="col-sm-6 col-lg-4 vehicle-item"
+                     data-name="@($"{vehicle.VehicleName} {vehicle.Brand} {vehicle.Model}")"
+                     data-category="@vehicle.Category"
+                     data-status="@(isAvailable ? "available" : "unavailable")">
+
+                    <article class="vehicle-card">
+
+                        <div class="vehicle-photo">
+                            @if (!string.IsNullOrWhiteSpace(vehicle.Image))
+                            {
+                                <img src="@Url.Content(vehicle.Image)"
+                                     alt="@vehicle.Brand @vehicle.VehicleName"
+                                     loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="vehicle-photo-placeholder">
+                                    Vehicle Image
+                                </div>
+                            }
+
+                            <span class="vehicle-status @(isAvailable ? "" : "unavailable")">
+                                @(isAvailable ? "Available" : vehicle.Status)
+                            </span>
+                        </div>
+
+                        <div class="vehicle-info">
+
+                            <span class="vehicle-category">
+                                @(string.IsNullOrWhiteSpace(vehicle.Category)
+                                    ? "Vehicle"
+                                    : vehicle.Category)
+                            </span>
+
+                            <h3 class="vehicle-name">
+                                @vehicle.VehicleName
+                            </h3>
+
+                            <p class="vehicle-brand">
+                                @vehicle.Brand @vehicle.Model
+                            </p>
+
+                            <div class="vehicle-specs">
+                                <div class="vehicle-spec">
+                                    <strong>Fuel</strong><br />
+                                    @(string.IsNullOrWhiteSpace(vehicle.FuelType)
+                                        ? "Not specified"
+                                        : vehicle.FuelType)
+                                </div>
+
+                                <div class="vehicle-spec">
+                                    <strong>Seats</strong><br />
+                                    @vehicle.SeatingCapacity
+                                </div>
+                            </div>
+
+                            <div class="vehicle-price-row">
+                                <span class="vehicle-price">
+                                    ₹@vehicle.PricePerDay.ToString("N0")
+                                </span>
+                                <span class="vehicle-price-unit">/ day</span>
+                            </div>
+
+                            <div class="vehicle-actions">
+                                <a asp-controller="Vehicle"
+                                   asp-action="Details"
+                                   asp-route-id="@vehicle.VehicleId"
+                                   class="btn btn-outline-success">
+                                    View Details
+                                </a>
+
+                                @if (isAdmin)
+                                {
+                                    <a asp-controller="Vehicle"
+                                       asp-action="Edit"
+                                       asp-route-id="@vehicle.VehicleId"
+                                       class="btn btn-success">
+                                        Edit
+                                    </a>
+                                }
+                            </div>
+
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+
+        <div class="vehicle-empty mt-4" id="vehicleEmpty">
+            <h3>No vehicles found</h3>
+            <p>Try changing your search or filter options.</p>
+            <button type="button" class="btn btn-success" id="clearFilters">
+                Clear Filters
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="vehicle-empty" style="display:block;">
+            <h3>No vehicles available yet</h3>
+            <p>
+                @if (isAdmin)
+                {
+                    <span>Add your first vehicle to get started.</span>
+                }
+                else
+                {
+                    <span>Please check again later for available vehicles.</span>
+                }
+            </p>
+
+            @if (isAdmin)
+            {
+                <a asp-controller="Vehicle"
+                   asp-action="Create"
+                   class="btn btn-success">
+                    Add Vehicle
+                </a>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("vehicleSearch");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const statusFilter = document.getElementById("statusFilter");
+        const vehicleItems = Array.from(document.querySelectorAll(".vehicle-item"));
+        const vehicleCount = document.getElementById("vehicleCount");
+        const emptyState = document.getElementById("vehicleEmpty");
+        const clearButton = document.getElementById("clearFilters");
+
+        function filterVehicles() {
+            const search = searchInput.value.trim().toLowerCase();
+            const category = categoryFilter.value.toLowerCase();
+            const status = statusFilter.value.toLowerCase();
+            let visibleCount = 0;
+
+            vehicleItems.forEach(function (item) {
+                const name = (item.dataset.name || "").toLowerCase();
+                const itemCategory = (item.dataset.category || "").toLowerCase();
+                const itemStatus = (item.dataset.status || "").toLowerCase();
+
+                const matchesSearch = name.includes(search);
+                const matchesCategory = !category || itemCategory === category;
+                const matchesStatus = !status || itemStatus === status;
+
+                const show = matchesSearch && matchesCategory && matchesStatus;
+
+                item.style.display = show ? "" : "none";
+
+                if (show) {
+                    visibleCount++;
+                }
+            });
+
+            if (vehicleCount) {
+                vehicleCount.textContent = visibleCount +
+                    (visibleCount === 1 ? " vehicle found" : " vehicles found");
+            }
+
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? "block" : "none";
+            }
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener("input", filterVehicles);
+        }
+
+        if (categoryFilter) {
+            categoryFilter.addEventListener("change", filterVehicles);
+        }
+
+        if (statusFilter) {
+            statusFilter.addEventListener("change", filterVehicles);
+        }
+
+        if (clearButton) {
+            clearButton.addEventListener("click", function () {
+                searchInput.value = "";
+                categoryFilter.value = "";
+                statusFilter.value = "";
+                filterVehicles();
+            });
+        }
+    });
+</script>

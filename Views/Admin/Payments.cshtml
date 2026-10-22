@@ -1,0 +1,386 @@
+
+@model IEnumerable<VehicleRentalSystem.Models.Payment>
+
+@{
+    ViewData["Title"] = "Payment Management";
+    var payments = Model?.ToList()
+        ?? new List<VehicleRentalSystem.Models.Payment>();
+}
+
+<style>
+    .payment-page {
+        background: #F7F8F4;
+        min-height: 100vh;
+        padding: 30px 0;
+    }
+
+    .payment-heading {
+        color: #123D2B;
+        font-weight: 800;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.06);
+    }
+
+    .table thead th {
+        background: #123D2B;
+        color: white;
+        white-space: nowrap;
+    }
+
+    .status-form {
+        min-width: 190px;
+    }
+
+    .btn-green {
+        background: #1E6545;
+        color: white;
+        border: none;
+    }
+
+    .btn-green:hover {
+        background: #123D2B;
+        color: white;
+    }
+
+    .section-title {
+        color: #123D2B;
+        font-weight: 700;
+    }
+
+    .refund-panel {
+        min-width: 230px;
+        background: #F7F8F4;
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .small-label {
+        font-size: .8rem;
+        font-weight: 600;
+        color: #555;
+    }
+</style>
+
+<div class="payment-page">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h1 class="payment-heading">Payment Management</h1>
+                <p class="text-muted mb-0">
+                    Verify payments and manage refunds for cancelled bookings.
+                </p>
+            </div>
+
+            <a asp-controller="Admin"
+               asp-action="Dashboard"
+               class="btn btn-outline-success">
+                Back to Dashboard
+            </a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @TempData["Error"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="payment-card h-100">
+                    <div class="text-muted">Total Payments</div>
+                    <h2 class="section-title">@payments.Count</h2>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="payment-card h-100">
+                    <div class="text-muted">Pending Verification</div>
+                    <h2 class="text-warning">
+                        @payments.Count(p => p.PaymentStatus == "Pending")
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="payment-card h-100">
+                    <div class="text-muted">Verified Payments</div>
+                    <h2 class="text-success">
+                        @payments.Count(p => p.PaymentStatus == "Paid")
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="payment-card">
+
+            @if (!payments.Any())
+            {
+                <div class="text-center py-5">
+                    <h4 class="text-secondary">No payment records found</h4>
+                    <p class="text-muted mb-0">
+                        Payment records will appear here when they exist in the database.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Booking</th>
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Payment Date</th>
+                                <th>Transaction ID</th>
+                                <th>Payment Status</th>
+                                <th>Verify Payment</th>
+                                <th>Refund Details</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var payment in payments)
+                            {
+                                var isCancelled =
+                                    payment.Booking?.BookingStatus == "Cancelled";
+
+                                var canManageRefund =
+                                    isCancelled &&
+                                    (payment.PaymentStatus == "Paid" ||
+                                     payment.PaymentStatus == "Refunded");
+
+                                <tr>
+                                    <td>#@payment.PaymentId</td>
+
+                                    <td>
+                                        <div class="fw-bold">
+                                            #@payment.BookingId
+                                        </div>
+                                        <small class="text-muted">
+                                            @(payment.Booking?.BookingStatus ?? "N/A")
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        @(payment.Booking?.Customer?.Name ?? "N/A")
+                                    </td>
+
+                                    <td>
+                                        @(payment.Booking?.Vehicle?.VehicleName ?? "N/A")
+                                    </td>
+
+                                    <td>@payment.PaymentMethod</td>
+
+                                    <td class="fw-bold">
+                                        ₹@payment.Amount.ToString("N2")
+                                    </td>
+
+                                    <td>
+                                        @payment.PaymentDate.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td style="min-width:150px; overflow-wrap:anywhere">
+                                        @(string.IsNullOrWhiteSpace(payment.TransactionId)
+                                            ? "Not submitted"
+                                            : payment.TransactionId)
+                                    </td>
+
+                                    <td>
+                                        <span class="badge rounded-pill
+                                            @(payment.PaymentStatus == "Paid" ? "bg-success" :
+                                              payment.PaymentStatus == "Failed" ? "bg-danger" :
+                                              payment.PaymentStatus == "Refunded" ? "bg-secondary" :
+                                              "bg-warning text-dark")">
+                                            @payment.PaymentStatus
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (payment.PaymentStatus == "Refunded")
+                                        {
+                                            <span class="text-secondary small">
+                                                Refunded
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Admin"
+                                                  asp-action="UpdatePaymentStatus"
+                                                  method="post"
+                                                  class="status-form">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="paymentId"
+                                                       value="@payment.PaymentId" />
+
+                                                <label class="small-label">
+                                                    New payment status
+                                                </label>
+
+                                                <select name="paymentStatus"
+                                                        class="form-select form-select-sm mb-2"
+                                                        required>
+                                                    <option value="Pending"
+                                                            selected="@(payment.PaymentStatus == "Pending")">
+                                                        Pending
+                                                    </option>
+                                                    <option value="Paid"
+                                                            selected="@(payment.PaymentStatus == "Paid")">
+                                                        Paid
+                                                    </option>
+                                                    <option value="Failed"
+                                                            selected="@(payment.PaymentStatus == "Failed")">
+                                                        Failed
+                                                    </option>
+                                                </select>
+
+                                                <button type="submit"
+                                                        class="btn btn-green btn-sm w-100">
+                                                    Save Status
+                                                </button>
+                                            </form>
+
+                                            @if (payment.PaymentStatus == "Pending")
+                                            {
+                                                <small class="d-block text-muted mt-2">
+                                                    Verify the transaction externally before marking Paid.
+                                                </small>
+                                            }
+                                        }
+                                    </td>
+
+                                    <td style="min-width:245px">
+                                        <div class="refund-panel">
+                                            <div class="small mb-2">
+                                                <strong>Status:</strong>
+                                                @payment.RefundStatus
+                                            </div>
+
+                                            <div class="small mb-2">
+                                                <strong>Refund amount:</strong>
+                                                ₹@payment.RefundAmount.ToString("N2")
+                                            </div>
+
+                                            @if (payment.RefundDate.HasValue)
+                                            {
+                                                <div class="small mb-2">
+                                                    <strong>Refund date:</strong>
+                                                    @payment.RefundDate.Value.ToString("dd MMM yyyy")
+                                                </div>
+                                            }
+
+                                            @if (canManageRefund &&
+                                                 payment.RefundStatus != "Refunded")
+                                            {
+                                                <form asp-controller="Admin"
+                                                      asp-action="UpdateRefundStatus"
+                                                      method="post">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="paymentId"
+                                                           value="@payment.PaymentId" />
+
+                                                    <label class="small-label">
+                                                        Refund amount (₹)
+                                                    </label>
+
+                                                    <input type="number"
+                                                           name="refundAmount"
+                                                           class="form-control form-control-sm mb-2"
+                                                           min="0.01"
+                                                           max="@payment.Amount"
+                                                           step="0.01"
+                                                           value="@(payment.RefundAmount > 0
+                                                               ? payment.RefundAmount.ToString("0.00",
+                                                                   System.Globalization.CultureInfo.InvariantCulture)
+                                                               : payment.Amount.ToString("0.00",
+                                                                   System.Globalization.CultureInfo.InvariantCulture))"
+                                                           required />
+
+                                                    <label class="small-label">
+                                                        Refund status
+                                                    </label>
+
+                                                    <select name="refundStatus"
+                                                            class="form-select form-select-sm mb-2"
+                                                            required>
+                                                        <option value="Pending"
+                                                                selected="@(payment.RefundStatus == "Pending")">
+                                                            Pending
+                                                        </option>
+                                                        <option value="Approved"
+                                                                selected="@(payment.RefundStatus == "Approved")">
+                                                            Approved
+                                                        </option>
+                                                        <option value="Rejected"
+                                                                selected="@(payment.RefundStatus == "Rejected")">
+                                                            Rejected
+                                                        </option>
+                                                        <option value="Refunded">
+                                                            Refunded - actual refund completed
+                                                        </option>
+                                                    </select>
+
+                                                    <button type="submit"
+                                                            class="btn btn-outline-success btn-sm w-100"
+                                                            onclick="return confirm('Confirm this refund status update? Select Refunded only after the money has actually been returned.');">
+                                                        Update Refund
+                                                    </button>
+                                                </form>
+                                            }
+                                            else if (!isCancelled)
+                                            {
+                                                <small class="text-muted">
+                                                    Refund management is available after booking cancellation.
+                                                </small>
+                                            }
+                                            else if (payment.PaymentStatus != "Paid" &&
+                                                     payment.PaymentStatus != "Refunded")
+                                            {
+                                                <small class="text-muted">
+                                                    Verify payment before managing a refund.
+                                                </small>
+                                            }
+                                            else if (payment.RefundStatus == "Refunded")
+                                            {
+                                                <span class="badge bg-success">
+                                                    Refund completed
+                                                </span>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

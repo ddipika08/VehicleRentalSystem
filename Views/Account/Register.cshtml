@@ -1,0 +1,279 @@
+
+@model VehicleRentalSystem.Models.Customer
+
+@{
+    ViewData["Title"] = "Customer Registration";
+}
+
+<style>
+    .register-page {
+        max-width: 1100px;
+        margin: 15px auto;
+    }
+
+    .register-card {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        overflow: hidden;
+        background: #FFFFFF;
+        border: 1px solid #E0E7DF;
+        border-radius: 24px;
+        box-shadow: 0 15px 45px rgba(18, 61, 43, 0.10);
+    }
+
+    .register-banner {
+        padding: 42px 34px;
+        color: white;
+        background: linear-gradient(145deg, #123D2B, #1E6545);
+    }
+
+    .register-banner h1 {
+        margin: 22px 0 14px;
+        color: white;
+        font-size: 34px;
+        font-weight: 850;
+        line-height: 1.2;
+    }
+
+    .register-banner p {
+        color: #E0EAE1;
+    }
+
+    .register-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 68px;
+        height: 68px;
+        color: #123D2B;
+        background: #D7F36B;
+        border-radius: 20px;
+        font-size: 25px;
+        font-weight: 850;
+    }
+
+    .register-benefit {
+        margin-top: 30px;
+        padding: 15px;
+        border: 1px solid rgba(255,255,255,.20);
+        border-radius: 12px;
+        color: #FFFFFF;
+        background: rgba(255,255,255,.06);
+    }
+
+    .register-form-area {
+        padding: 36px 40px;
+    }
+
+    .register-form-area h2 {
+        color: #123D2B;
+        font-size: 28px;
+        font-weight: 850;
+        margin-bottom: 5px;
+    }
+
+    .register-subtitle {
+        margin-bottom: 24px;
+        color: #718075;
+    }
+
+    .register-form-area .form-control {
+        min-height: 46px;
+        margin-top: 5px;
+    }
+
+    .register-form-area textarea.form-control {
+        min-height: 85px;
+    }
+
+    .register-form-area .form-label {
+        margin-bottom: 3px;
+    }
+
+    .register-submit {
+        min-height: 49px;
+        margin-top: 8px;
+        color: white;
+        background: #1E6545;
+        border-color: #1E6545;
+        font-weight: 750;
+    }
+
+    .register-submit:hover {
+        color: white;
+        background: #123D2B;
+        border-color: #123D2B;
+    }
+
+    .register-bottom {
+        margin-top: 21px;
+        padding-top: 18px;
+        border-top: 1px solid #E0E7DF;
+        text-align: center;
+        color: #718075;
+    }
+
+    .register-bottom a {
+        color: #1E6545;
+        font-weight: 750;
+    }
+
+    @@media (max-width: 767px) {
+        .register-page {
+            margin: 10px auto;
+        }
+
+        .register-card {
+            grid-template-columns: 1fr;
+            border-radius: 18px;
+        }
+
+        .register-banner {
+            padding: 28px;
+        }
+
+        .register-banner h1 {
+            font-size: 28px;
+        }
+
+        .register-benefit {
+            margin-top: 18px;
+        }
+
+        .register-form-area {
+            padding: 28px 22px;
+        }
+    }
+</style>
+
+<div class="container register-page">
+    <div class="register-card">
+
+        <section class="register-banner">
+            <div class="register-icon">VR</div>
+
+            <h1>Your next journey begins here.</h1>
+
+            <p>
+                Create your account to discover rental vehicles
+                and manage your trips from one place.
+            </p>
+
+            <div class="register-benefit">
+                <div style="color:#D7F36B;font-weight:800;margin-bottom:6px;">
+                    Join Vehicle Rental
+                </div>
+                <div>
+                    Browse vehicles, make bookings and view your booking details
+                    through your customer account.
+                </div>
+            </div>
+        </section>
+
+        <section class="register-form-area">
+            <h2>Create Account</h2>
+            <p class="register-subtitle">
+                Enter your details to get started.
+            </p>
+
+            <form asp-action="Register" method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label">
+                            Full Name
+                        </label>
+                        <input asp-for="Name"
+                               class="form-control"
+                               placeholder="Enter your full name"
+                               autocomplete="name" />
+                        <span asp-validation-for="Name"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email" class="form-label">
+                            Email Address
+                        </label>
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="you@example.com"
+                               autocomplete="email" />
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Phone" class="form-label">
+                            Mobile Number
+                        </label>
+                        <input asp-for="Phone"
+                               class="form-control"
+                               placeholder="Enter mobile number"
+                               autocomplete="tel" />
+                        <span asp-validation-for="Phone"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DrivingLicenseNo" class="form-label">
+                            Driving License Number
+                        </label>
+                        <input asp-for="DrivingLicenseNo"
+                               class="form-control"
+                               placeholder="Enter license number" />
+                        <span asp-validation-for="DrivingLicenseNo"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label asp-for="Address" class="form-label">
+                            Address
+                        </label>
+                        <textarea asp-for="Address"
+                                  class="form-control"
+                                  rows="2"
+                                  placeholder="Enter your full address"
+                                  autocomplete="street-address"></textarea>
+                        <span asp-validation-for="Address"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label asp-for="Password" class="form-label">
+                            Password
+                        </label>
+                        <input asp-for="Password"
+                               type="password"
+                               class="form-control"
+                               placeholder="Create a password"
+                               autocomplete="new-password" />
+                        <span asp-validation-for="Password"
+                              class="text-danger"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn register-submit w-100">
+                    Create My Account →
+                </button>
+            </form>
+
+            <div class="register-bottom">
+                Already have an account?
+                <a asp-controller="Account" asp-action="Login">
+                    Sign In
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

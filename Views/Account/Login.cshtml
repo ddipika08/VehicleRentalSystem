@@ -1,0 +1,214 @@
+
+@{
+    ViewData["Title"] = "Customer Login";
+}
+
+<style>
+    .auth-page {
+        max-width: 1050px;
+        margin: 20px auto;
+    }
+
+    .auth-card {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #E0E7DF;
+        border-radius: 24px;
+        box-shadow: 0 15px 45px rgba(18, 61, 43, 0.10);
+    }
+
+    .auth-banner {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 42px;
+        color: white;
+        background: linear-gradient(145deg, #123D2B, #1E6545);
+    }
+
+    .auth-banner h1 {
+        color: white;
+        font-size: 36px;
+        font-weight: 850;
+        line-height: 1.2;
+        margin: 18px 0;
+    }
+
+    .auth-banner p {
+        color: #E0EAE1;
+    }
+
+    .auth-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 68px;
+        height: 68px;
+        border-radius: 20px;
+        color: #123D2B;
+        background: #D7F36B;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .auth-content {
+        padding: 45px 42px;
+    }
+
+    .auth-content h2 {
+        color: #123D2B;
+        font-size: 29px;
+        font-weight: 800;
+        margin-bottom: 7px;
+    }
+
+    .auth-subtitle {
+        color: #718075;
+        margin-bottom: 28px;
+    }
+
+    .auth-content .form-control {
+        min-height: 49px;
+        margin-top: 7px;
+    }
+
+    .auth-content .form-label {
+        margin-bottom: 3px;
+    }
+
+    .auth-submit {
+        min-height: 49px;
+        margin-top: 8px;
+        background: #1E6545;
+        border-color: #1E6545;
+        color: white;
+        font-weight: 750;
+    }
+
+    .auth-submit:hover {
+        background: #123D2B;
+        border-color: #123D2B;
+        color: white;
+    }
+
+    .auth-bottom {
+        margin-top: 23px;
+        padding-top: 20px;
+        border-top: 1px solid #E0E7DF;
+        text-align: center;
+        color: #718075;
+    }
+
+    .auth-bottom a {
+        color: #1E6545;
+        font-weight: 750;
+    }
+
+    .auth-bottom a:hover {
+        text-decoration: underline;
+    }
+
+    @@media (max-width: 767px) {
+        .auth-page {
+            margin: 10px auto;
+        }
+
+        .auth-card {
+            grid-template-columns: 1fr;
+            border-radius: 18px;
+        }
+
+        .auth-banner {
+            padding: 28px;
+        }
+
+        .auth-banner h1 {
+            font-size: 29px;
+        }
+
+        .auth-content {
+            padding: 30px 24px;
+        }
+    }
+</style>
+
+<div class="container auth-page">
+    <div class="auth-card">
+
+        <section class="auth-banner">
+            <div class="auth-icon">VR</div>
+
+            <h1>Every journey starts with the right ride.</h1>
+
+            <p>
+                Sign in to explore vehicles, manage your bookings
+                and make your next journey easier.
+            </p>
+
+            <div class="mt-3">
+                <span style="color:#D7F36B;font-weight:700;">
+                    Simple. Comfortable. Reliable.
+                </span>
+            </div>
+        </section>
+
+        <section class="auth-content">
+            <h2>Welcome Back</h2>
+            <p class="auth-subtitle">
+                Sign in to your customer account.
+            </p>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div class="mb-4">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           class="form-control"
+                           placeholder="you@example.com"
+                           autocomplete="email"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           autocomplete="current-password"
+                           required />
+                </div>
+
+                <button type="submit" class="btn auth-submit w-100">
+                    Sign In to Your Account →
+                </button>
+            </form>
+
+            <div class="auth-bottom">
+                Don't have an account?
+                <a asp-controller="Account" asp-action="Register">
+                    Create Account
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>

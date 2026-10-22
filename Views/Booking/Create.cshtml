@@ -1,0 +1,213 @@
+@model VehicleRentalSystem.Models.Booking
+
+@{
+    ViewData["Title"] = "Book Vehicle";
+}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-7">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Book Vehicle</h3>
+                </div>
+
+                <div class="card-body">
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="All"
+                             class="alert alert-danger">
+                        </div>
+                    }
+
+                    <div class="alert alert-info">
+
+                        <h5>@Model.Vehicle?.VehicleName</h5>
+
+                        <p class="mb-1">
+                            <strong>Brand:</strong>
+                            @Model.Vehicle?.Brand
+                        </p>
+
+                        <p class="mb-1">
+                            <strong>Model:</strong>
+                            @Model.Vehicle?.Model
+                        </p>
+
+                        <p class="mb-1">
+                            <strong>Vehicle Number:</strong>
+                            @Model.Vehicle?.VehicleNumber
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Price:</strong>
+                            ₹@Model.Vehicle?.PricePerDay / day
+                        </p>
+
+                    </div>
+
+                    <form asp-action="Create" method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               asp-for="VehicleId" />
+
+                        <div class="mb-3">
+
+                            <label asp-for="PickupDate"
+                                   class="form-label">
+                                Pickup Date
+                            </label>
+
+                            <input asp-for="PickupDate"
+                                   type="date"
+                                   class="form-control"
+                                   id="pickupDate" />
+
+                            <span asp-validation-for="PickupDate"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="ReturnDate"
+                                   class="form-label">
+                                Return Date
+                            </label>
+
+                            <input asp-for="ReturnDate"
+                                   type="date"
+                                   class="form-control"
+                                   id="returnDate" />
+
+                            <span asp-validation-for="ReturnDate"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="card bg-light mb-3">
+
+                            <div class="card-body">
+
+                                <h5>Booking Summary</h5>
+
+                                <p>
+                                    <strong>Total Days:</strong>
+                                    <span id="totalDays">1</span>
+                                </p>
+
+                                <p class="mb-0">
+                                    <strong>Total Amount:</strong>
+                                    ₹<span id="totalAmount">0</span>
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Confirm Booking
+                            </button>
+
+                            <a asp-controller="Vehicle"
+                               asp-action="Details"
+                               asp-route-id="@Model.VehicleId"
+                               class="btn btn-secondary">
+                                Back
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const pickupDate =
+            document.getElementById("pickupDate");
+
+        const returnDate =
+            document.getElementById("returnDate");
+
+        const totalDays =
+            document.getElementById("totalDays");
+
+        const totalAmount =
+            document.getElementById("totalAmount");
+
+        const pricePerDay =
+            @Model.Vehicle?.PricePerDay.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        function calculateBooking()
+        {
+            const pickup =
+                new Date(pickupDate.value);
+
+            const returnDateValue =
+                new Date(returnDate.value);
+
+            if (
+                pickupDate.value &&
+                returnDate.value &&
+                returnDateValue > pickup
+            )
+            {
+                const difference =
+                    returnDateValue - pickup;
+
+                const days =
+                    Math.ceil(
+                        difference / (1000 * 60 * 60 * 24)
+                    );
+
+                totalDays.textContent = days;
+
+                totalAmount.textContent =
+                    (days * pricePerDay).toFixed(2);
+            }
+            else
+            {
+                totalDays.textContent = "0";
+                totalAmount.textContent = "0";
+            }
+        }
+
+        pickupDate.addEventListener(
+            "change",
+            calculateBooking
+        );
+
+        returnDate.addEventListener(
+            "change",
+            calculateBooking
+        );
+
+        calculateBooking();
+
+    </script>
+}

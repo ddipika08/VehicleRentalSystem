@@ -1,0 +1,342 @@
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    .dashboard-page {
+        max-width: 1250px;
+        margin: auto;
+    }
+
+    .dashboard-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 32px;
+        margin-bottom: 28px;
+        border-radius: 20px;
+        color: white;
+        background: linear-gradient(120deg, #123D2B, #1E6545);
+    }
+
+    .dashboard-hero h1 {
+        color: white;
+        font-size: clamp(26px, 4vw, 36px);
+        font-weight: 850;
+        margin-bottom: 7px;
+    }
+
+    .dashboard-hero p {
+        margin: 0;
+        color: #E0EAE1;
+    }
+
+    .dashboard-logout {
+        color: #123D2B !important;
+        background: #D7F36B !important;
+        border-color: #D7F36B !important;
+        white-space: nowrap;
+    }
+
+    .dashboard-logout:hover {
+        background: white !important;
+        border-color: white !important;
+    }
+
+    .dashboard-stat {
+        display: block;
+        height: 100%;
+        padding: 23px;
+        background: white;
+        border: 1px solid #E0E7DF;
+        border-radius: 17px;
+        box-shadow: 0 7px 24px rgba(18, 61, 43, .06);
+        transition: transform .2s ease, box-shadow .2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .dashboard-stat:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 13px 30px rgba(18, 61, 43, .11);
+    }
+
+    .dashboard-stat:focus-visible {
+        outline: 3px solid #1E6545;
+        outline-offset: 3px;
+    }
+
+    .dashboard-stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .dashboard-stat-label {
+        margin: 0;
+        color: #718075;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .dashboard-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        flex-shrink: 0;
+        color: #1E6545;
+        background: #E8F2E9;
+        border-radius: 13px;
+        font-size: 21px;
+    }
+
+    .dashboard-stat-number {
+        color: #123D2B;
+        font-size: 34px;
+        font-weight: 850;
+        line-height: 1.2;
+        margin-bottom: 17px;
+    }
+
+    .dashboard-stat-link {
+        color: #1E6545;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .dashboard-stat:hover .dashboard-stat-link {
+        color: #123D2B;
+        text-decoration: underline;
+    }
+
+    .dashboard-section {
+        margin-top: 28px;
+        padding: 27px;
+        background: white;
+        border: 1px solid #E0E7DF;
+        border-radius: 18px;
+        box-shadow: 0 7px 24px rgba(18, 61, 43, .05);
+    }
+
+    .dashboard-section h2 {
+        color: #123D2B;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .dashboard-action {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 22px;
+        background: #F7F8F4;
+        border: 1px solid #E0E7DF;
+        border-radius: 14px;
+    }
+
+    .dashboard-action h3 {
+        color: #123D2B;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .dashboard-action p {
+        flex: 1;
+        margin-bottom: 18px;
+        font-size: 14px;
+    }
+
+    .dashboard-action .btn {
+        align-self: flex-start;
+    }
+
+    @@media (max-width: 767px) {
+        .dashboard-hero {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 25px 21px;
+        }
+
+        .dashboard-stat {
+            padding: 19px;
+        }
+
+        .dashboard-section {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="container dashboard-page">
+
+    <section class="dashboard-hero">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Welcome to your Vehicle Rental Management System.</p>
+        </div>
+
+        <form asp-controller="Admin"
+              asp-action="Logout"
+              method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn dashboard-logout">
+                Logout →
+            </button>
+        </form>
+    </section>
+
+    <div class="mb-4">
+        <h2 class="section-title">Overview</h2>
+        <p>Monitor your rental business from one place.</p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Total Vehicles -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Vehicle"
+               asp-action="Index"
+               class="dashboard-stat">
+                <div class="dashboard-stat-top">
+                    <p class="dashboard-stat-label">Total Vehicles</p>
+                    <div class="dashboard-stat-icon">🚘</div>
+                </div>
+
+                <div class="dashboard-stat-number">
+                    @ViewBag.VehicleCount
+                </div>
+
+                <span class="dashboard-stat-link">
+                    Manage vehicles →
+                </span>
+            </a>
+        </div>
+
+        <!-- Total Customers -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Admin"
+               asp-action="Customers"
+               class="dashboard-stat">
+                <div class="dashboard-stat-top">
+                    <p class="dashboard-stat-label">Total Customers</p>
+                    <div class="dashboard-stat-icon">👥</div>
+                </div>
+
+                <div class="dashboard-stat-number">
+                    @ViewBag.CustomerCount
+                </div>
+
+                <span class="dashboard-stat-link">
+                    View customers →
+                </span>
+            </a>
+        </div>
+
+        <!-- Total Bookings -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Admin"
+               asp-action="Bookings"
+               class="dashboard-stat">
+                <div class="dashboard-stat-top">
+                    <p class="dashboard-stat-label">Total Bookings</p>
+                    <div class="dashboard-stat-icon">📋</div>
+                </div>
+
+                <div class="dashboard-stat-number">
+                    @ViewBag.BookingCount
+                </div>
+
+                <span class="dashboard-stat-link">
+                    View bookings →
+                </span>
+            </a>
+        </div>
+
+        <!-- Total Payments -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Admin"
+               asp-action="Payments"
+               class="dashboard-stat">
+                <div class="dashboard-stat-top">
+                    <p class="dashboard-stat-label">Total Payments</p>
+                    <div class="dashboard-stat-icon">₹</div>
+                </div>
+
+                <div class="dashboard-stat-number">
+                    @ViewBag.PaymentCount
+                </div>
+
+                <span class="dashboard-stat-link">
+                    View payments →
+                </span>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <section class="dashboard-section">
+        <div class="mb-4">
+            <h2>Quick Actions</h2>
+            <p class="mb-0">
+                Access the main management sections quickly.
+            </p>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <div class="dashboard-action">
+                    <h3>Vehicle Management</h3>
+                    <p>Add new vehicles or update existing fleet information.</p>
+
+                    <a asp-controller="Vehicle"
+                       asp-action="Create"
+                       class="btn btn-success">
+                        + Add Vehicle
+                    </a>
+
+                    <a asp-controller="Vehicle"
+                       asp-action="Index"
+                       class="btn btn-outline-success mt-2">
+                        View All Vehicles
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="dashboard-action">
+                    <h3>Customer Management</h3>
+                    <p>Review customer information stored in the system.</p>
+
+                    <a asp-controller="Admin"
+                       asp-action="Customers"
+                       class="btn btn-success">
+                        View Customers
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="dashboard-action">
+                    <h3>Booking Management</h3>
+                    <p>Review rental bookings and their current details.</p>
+
+                    <a asp-controller="Admin"
+                       asp-action="Bookings"
+                       class="btn btn-success">
+                        View Bookings
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+</div>

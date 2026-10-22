@@ -1,0 +1,298 @@
+@model IEnumerable<VehicleRentalSystem.Models.Booking>
+
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<style>
+    .my-bookings-page {
+        padding-top: 30px;
+        padding-bottom: 50px;
+    }
+
+    .booking-heading {
+        color: #123D2B;
+        font-weight: 800;
+    }
+
+    .booking-subtitle {
+        color: #68756b;
+    }
+
+    .booking-card {
+        height: 100%;
+        border: 1px solid #e4eae3;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(18, 61, 43, .08);
+        background: white;
+    }
+
+    .booking-card-header {
+        background: #f1f6ed;
+        padding: 20px;
+        border-bottom: 1px solid #e4eae3;
+    }
+
+    .booking-card-body {
+        padding: 22px;
+    }
+
+    .booking-info {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #edf0eb;
+    }
+
+    .booking-label {
+        color: #68756b;
+    }
+
+    .booking-value {
+        color: #123D2B;
+        font-weight: 650;
+        text-align: right;
+    }
+
+    .status-badge {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .status-confirmed {
+        background: #e5f4e7;
+        color: #176333;
+    }
+
+    .status-cancelled {
+        background: #fde8e7;
+        color: #a32620;
+    }
+
+    .status-other {
+        background: #fff0cc;
+        color: #805b00;
+    }
+
+    .booking-vehicle-title {
+        color: #123D2B;
+        font-weight: 800;
+    }
+
+    .booking-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .btn-forest {
+        background: #123D2B;
+        border-color: #123D2B;
+        color: white;
+    }
+
+    .btn-forest:hover {
+        background: #1E6545;
+        border-color: #1E6545;
+        color: white;
+    }
+
+    .empty-bookings {
+        padding: 45px 20px;
+        border: 1px dashed #b9c9b9;
+        border-radius: 18px;
+        background: #f8faf6;
+        text-align: center;
+    }
+</style>
+
+<div class="container my-bookings-page">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="booking-heading">My Bookings</h1>
+            <p class="booking-subtitle mb-0">
+                View your reservations and manage your bookings.
+            </p>
+        </div>
+
+        <a asp-controller="Vehicle"
+           asp-action="Index"
+           class="btn btn-forest">
+            Browse Vehicles
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var booking in Model)
+            {
+                <div class="col-lg-6">
+
+                    <div class="booking-card">
+
+                        <div class="booking-card-header">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <h4 class="booking-vehicle-title mb-1">
+                                        @(booking.Vehicle?.VehicleName ?? "Vehicle")
+                                    </h4>
+
+                                    <div class="text-muted small">
+                                        Booking #@booking.BookingId
+                                    </div>
+                                </div>
+
+                                @if (booking.BookingStatus == "Confirmed")
+                                {
+                                    <span class="status-badge status-confirmed">
+                                        Confirmed
+                                    </span>
+                                }
+                                else if (booking.BookingStatus == "Cancelled")
+                                {
+                                    <span class="status-badge status-cancelled">
+                                        Cancelled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-other">
+                                        @booking.BookingStatus
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="booking-card-body">
+
+                            <div class="booking-info">
+                                <span class="booking-label">Vehicle</span>
+                                <span class="booking-value">
+                                    @(booking.Vehicle?.Brand ?? "")
+                                    @(booking.Vehicle?.Model ?? "")
+                                </span>
+                            </div>
+
+                            <div class="booking-info">
+                                <span class="booking-label">Booking Date</span>
+                                <span class="booking-value">
+                                    @booking.BookingDate.ToLocalTime().ToString("dd MMM yyyy")
+                                </span>
+                            </div>
+
+                            <div class="booking-info">
+                                <span class="booking-label">Pickup Date</span>
+                                <span class="booking-value">
+                                    @booking.PickupDate.ToString("dd MMM yyyy")
+                                </span>
+                            </div>
+
+                            <div class="booking-info">
+                                <span class="booking-label">Return Date</span>
+                                <span class="booking-value">
+                                    @booking.ReturnDate.ToString("dd MMM yyyy")
+                                </span>
+                            </div>
+
+                            <div class="booking-info">
+                                <span class="booking-label">Total Days</span>
+                                <span class="booking-value">
+                                    @booking.TotalDays days
+                                </span>
+                            </div>
+
+                            <div class="booking-info">
+                                <span class="booking-label">Total Amount</span>
+                                <span class="booking-value">
+                                    ₹@booking.TotalAmount.ToString("N2")
+                                </span>
+                            </div>
+
+                            <div class="booking-actions">
+
+                                <a asp-controller="Booking"
+                                   asp-action="Details"
+                                   asp-route-id="@booking.BookingId"
+                                   class="btn btn-outline-success">
+                                    View Details
+                                </a>
+
+                                @if (booking.BookingStatus == "Confirmed")
+                                {
+                                    <a asp-controller="Payment"
+                                       asp-action="Pay"
+                                       asp-route-bookingId="@booking.BookingId"
+                                       class="btn btn-success">
+                                        Pay Now
+                                    </a>
+
+                                    <form asp-controller="Booking"
+                                          asp-action="Cancel"
+                                          asp-route-id="@booking.BookingId"
+                                          method="post"
+                                          onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit" class="btn btn-danger">
+                                            Cancel Booking
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="empty-bookings">
+            <h4 class="booking-heading">No Bookings Yet</h4>
+
+            <p class="text-muted">
+                You have not booked any vehicle yet.
+            </p>
+
+            <a asp-controller="Vehicle"
+               asp-action="Index"
+               class="btn btn-forest">
+                Browse Vehicles
+            </a>
+        </div>
+    }
+
+</div>

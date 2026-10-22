@@ -1,0 +1,313 @@
+@model VehicleRentalSystem.Models.Payment
+
+@{
+    ViewData["Title"] = "Rental Payment";
+    var booking = Model.Booking;
+}
+
+<style>
+    .payment-page {
+        background: #F7F8F4;
+        min-height: 100vh;
+        padding: 35px 0;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 6px 25px rgba(0,0,0,.07);
+    }
+
+    .payment-title {
+        color: #123D2B;
+        font-weight: 800;
+    }
+
+    .method-card {
+        border: 1px solid #dce5dc;
+        border-radius: 14px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    .btn-green {
+        background: #1E6545;
+        color: white;
+        border: none;
+    }
+
+    .btn-green:hover {
+        background: #123D2B;
+        color: white;
+    }
+
+    .qr-image {
+        max-width: 260px;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 8px;
+    }
+</style>
+
+<div class="payment-page">
+    <div class="container">
+
+        <div class="mb-4">
+            <h1 class="payment-title">Rental Payment</h1>
+            <p class="text-muted">
+                Choose how you want to pay for your booking.
+            </p>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <div class="row g-4">
+
+            <div class="col-lg-5">
+                <div class="payment-card">
+                    <h4 class="payment-title mb-3">Booking Summary</h4>
+
+                    <p>
+                        <strong>Booking ID:</strong>
+                        #@Model.BookingId
+                    </p>
+
+                    <p>
+                        <strong>Vehicle:</strong>
+                        @(booking?.Vehicle?.VehicleName ?? "Vehicle")
+                    </p>
+
+                    <p>
+                        <strong>Rental days:</strong>
+                        @(booking?.TotalDays ?? 0)
+                    </p>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>Total Amount</strong>
+                        <h3 class="payment-title mb-0">
+                            ₹@Model.Amount.ToString("N2")
+                        </h3>
+                    </div>
+
+                    <div class="mt-3">
+                        <strong>Payment status:</strong>
+                        <span class="badge bg-warning text-dark">
+                            @Model.PaymentStatus
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="payment-card">
+
+                    <h4 class="payment-title mb-4">
+                        Select Payment Method
+                    </h4>
+
+                    @if (Model.PaymentMethod != "Online QR" &&
+                         Model.PaymentMethod != "Cash")
+                    {
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <div class="method-card">
+                                    <h5>Online Payment</h5>
+                                    <p class="text-muted">
+                                        Scan the UPI QR code using a supported payment app.
+                                    </p>
+
+                                    <form asp-controller="Payment"
+                                          asp-action="SelectMethod"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="paymentId"
+                                               value="@Model.PaymentId" />
+
+                                        <input type="hidden"
+                                               name="paymentMethod"
+                                               value="Online QR" />
+
+                                        <button type="submit"
+                                                class="btn btn-green w-100">
+                                            Pay Online
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="method-card">
+                                    <h5>Cash Payment</h5>
+                                    <p class="text-muted">
+                                        Pay cash to the rental staff.
+                                    </p>
+
+                                    <form asp-controller="Payment"
+                                          asp-action="SelectMethod"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="paymentId"
+                                               value="@Model.PaymentId" />
+
+                                        <input type="hidden"
+                                               name="paymentMethod"
+                                               value="Cash" />
+
+                                        <button type="submit"
+                                                class="btn btn-outline-success w-100">
+                                            Choose Cash
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                    else if (Model.PaymentMethod == "Online QR")
+                    {
+                        <div class="text-center">
+
+                            <h5>Scan to Pay</h5>
+
+                            @if ((bool)ViewBag.IsPlaceholderUpi)
+                            {
+                                <div class="alert alert-warning text-start">
+                                    <strong>Setup required:</strong>
+                                    This is a placeholder UPI ID:
+                                    @ViewBag.UpiId.
+                                    Replace it with your real UPI ID before accepting payments.
+                                    This QR will not send money to a real account yet.
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted">
+                                    Pay ₹@Model.Amount.ToString("N2") to
+                                    @ViewBag.UpiId
+                                </p>
+                            }
+
+                            <img src="@ViewBag.QrImageUrl"
+                                 alt="UPI payment QR code"
+                                 class="qr-image mb-3" />
+
+                            <p class="text-muted">
+                                After paying, enter your transaction reference below.
+                            </p>
+
+                            <form asp-controller="Payment"
+                                  asp-action="SubmitTransaction"
+                                  method="post"
+                                  class="text-start">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="paymentId"
+                                       value="@Model.PaymentId" />
+
+                                <label class="form-label">
+                                    UPI Transaction Reference
+                                </label>
+
+                                <input type="text"
+                                       name="transactionId"
+                                       class="form-control mb-3"
+                                       maxlength="100"
+                                       placeholder="Enter transaction reference"
+                                       required />
+
+                                <button type="submit"
+                                        class="btn btn-green w-100">
+                                    Submit for Verification
+                                </button>
+                            </form>
+
+                            <form asp-controller="Payment"
+                                  asp-action="SelectMethod"
+                                  method="post"
+                                  class="mt-3">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="paymentId"
+                                       value="@Model.PaymentId" />
+
+                                <input type="hidden"
+                                       name="paymentMethod"
+                                       value="Cash" />
+
+                                <button type="submit"
+                                        class="btn btn-outline-secondary">
+                                    Switch to Cash
+                                </button>
+                            </form>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <h5>Cash Payment Selected</h5>
+                            <p class="mb-0">
+                                Pay the rental staff. Your payment will remain Pending
+                                until the admin confirms receipt.
+                            </p>
+                        </div>
+
+                        <a asp-controller="Payment"
+                           asp-action="Confirmation"
+                           asp-route-paymentId="@Model.PaymentId"
+                           class="btn btn-green w-100">
+                            View Payment Status
+                        </a>
+
+                        <form asp-controller="Payment"
+                              asp-action="SelectMethod"
+                              method="post"
+                              class="mt-3">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="paymentId"
+                                   value="@Model.PaymentId" />
+
+                            <input type="hidden"
+                                   name="paymentMethod"
+                                   value="Online QR" />
+
+                            <button type="submit"
+                                    class="btn btn-outline-success w-100">
+                                Switch to Online QR
+                            </button>
+                        </form>
+                    }
+
+                    <a asp-controller="Booking"
+                       asp-action="MyBookings"
+                       class="btn btn-link mt-3">
+                        Back to My Bookings
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

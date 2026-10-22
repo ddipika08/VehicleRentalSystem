@@ -1,0 +1,169 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Vehicle Rental System</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+
+                <a class="navbar-brand"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    Vehicle Rental
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarMenu"
+                        aria-controls="navbarMenu"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse"
+                     id="navbarMenu">
+
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Vehicle"
+                               asp-action="Index">
+                                Vehicles
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav">
+
+                        @if (Context.Session.GetString("IsAdmin") == "true")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Admin"
+                                   asp-action="Dashboard">
+                                    Admin Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Vehicle"
+                                   asp-action="Index">
+                                    Manage Vehicles
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <span class="nav-link">
+                                    Welcome, Admin
+                                </span>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-warning"
+                                   asp-controller="Admin"
+                                   asp-action="Logout">
+                                    Admin Logout
+                                </a>
+                            </li>
+                        }
+                        else if (Context.Session.GetInt32("CustomerId") != null)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">
+                                    Welcome,
+                                    @Context.Session.GetString("CustomerName")
+                                </span>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Booking"
+                                   asp-action="MyBookings">
+                                    My Bookings
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Account"
+                                   asp-action="Logout">
+                                    Logout
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Account"
+                                   asp-action="Register">
+                                    Register
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Account"
+                                   asp-action="Login">
+                                    Customer Login
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-warning"
+                                   asp-controller="Admin"
+                                   asp-action="Login">
+                                    Admin Login
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container py-3">
+            &copy; 2026 - Vehicle Rental System
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
